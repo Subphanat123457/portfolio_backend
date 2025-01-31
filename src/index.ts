@@ -26,28 +26,32 @@ const app = new Elysia()
     }
   ))
 
-  .use(
-    swagger({
-      path: '/api/docs', // เส้นทาง Swagger UI
-      documentation: {
-        info: {
-          title: 'Portfolio API',
-          version: '1.0.0',
+if (process.env.NODE_ENV === 'production') {
+  app
+    .use(
+      swagger({
+        path: '/api/docs', // เส้นทาง Swagger UI
+        documentation: {
+          info: {
+            title: 'Portfolio API',
+            version: '1.0.0',
+          },
+          tags: [
+            { name: 'Profile', description: 'Operations related to user profiles' },
+            { name: 'User', description: 'Operations related to users' },
+            { name: 'About', description: 'Operations related to about' },
+            { name: 'Skill', description: 'Operations related to skills' },
+            { name: 'Experience', description: 'Operations related to experiences' },
+            { name: 'Education', description: 'Operations related to educations' },
+            { name: 'Certificate', description: 'Operations related to certificates' },
+            { name: 'Project', description: 'Operations related to projects' },
+            { name: 'Auth', description: 'Operations related to authentication' },
+          ],
         },
-        tags: [
-          { name: 'Profile', description: 'Operations related to user profiles' },
-          { name: 'User', description: 'Operations related to users' },
-          { name: 'About', description: 'Operations related to about' },
-          { name: 'Skill', description: 'Operations related to skills' },
-          { name: 'Experience', description: 'Operations related to experiences' },
-          { name: 'Education', description: 'Operations related to educations' },
-          { name: 'Certificate', description: 'Operations related to certificates' },
-          { name: 'Project', description: 'Operations related to projects' },
-          { name: 'Auth', description: 'Operations related to authentication' },
-        ],
-      },
-    })
-  )
+      })
+    )
+}
+app
   .group('/api', (app) =>
     app.use(profileRoutes).use(userRoutes).use(aboutRoutes).use(skillRoutes).use(experienceRoutes).use(educationRoutes).use(certificateRoutes).use(projectRoutes).use(authRoutes)
   )
