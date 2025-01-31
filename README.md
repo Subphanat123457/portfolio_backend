@@ -15,22 +15,8 @@ bun run dev
 ```
 
 The API will be available at http://localhost:3000
-Swagger documentation is available at http://localhost:3000/swagger
+Swagger documentation is available at http://localhost:3000/api/docs
 
-## API Endpoints
-
-### Users
-- GET /api/users - Get all users
-- GET /api/users/:id - Get user by ID
-- POST /api/users - Create new user
-- PUT /api/users/:id - Update user
-
-### Posts
-- GET /api/posts - Get all posts
-- GET /api/posts/:id - Get post by ID
-- POST /api/posts - Create new post
-- PUT /api/posts/:id - Update post
-- DELETE /api/posts/:id - Delete post
 
 ## Project Structure
 
