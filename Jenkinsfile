@@ -20,7 +20,8 @@ pipeline {
             steps {
                 script {
                     dir(BACKEND_DIR) {
-                        sh 'docker build -t ${REGISTRY}/${BACKEND_IMAGE} -f ${BACKEND_DOCKERFILE} .'
+                        // ใช้ sudo เพื่อรันคำสั่ง Docker build
+                        sh 'sudo docker build -t ${REGISTRY}/${BACKEND_IMAGE} -f ${BACKEND_DOCKERFILE} .'
                     }
                 }
             }
@@ -31,11 +32,12 @@ pipeline {
                 script {
                     // Login to Docker registry using Jenkins Credentials
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD ${REGISTRY}'
+                        // ใช้ sudo เพื่อทำการ login
+                        sh 'sudo docker login -u $DOCKER_USER -p $DOCKER_PASSWORD ${REGISTRY}'
                     }
 
                     // Push the backend Docker image
-                    sh 'docker push ${REGISTRY}/${BACKEND_IMAGE}'
+                    sh 'sudo docker push ${REGISTRY}/${BACKEND_IMAGE}'
                 }
             }
         }
@@ -43,9 +45,9 @@ pipeline {
         stage('Deploy Backend to Kubernetes') {
             steps {
                 script {
-                    // Deploy Backend service to Kubernetes (ปรับคำสั่งตามที่ใช้งาน)
+                    // ใช้ sudo เพื่อรันคำสั่ง Kubernetes
                     sh '''
-                    kubectl set image deployment/backend-deployment backend=${REGISTRY}/${BACKEND_IMAGE} --record
+                    sudo kubectl set image deployment/backend-deployment backend=${REGISTRY}/${BACKEND_IMAGE} --record
                     '''
                 }
             }
