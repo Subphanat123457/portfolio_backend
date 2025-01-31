@@ -1,5 +1,5 @@
 # ใช้ Base Image ของ Bun
-FROM oven/bun:latest
+FROM oven/bun:latest AS builder
 
 # ตั้ง Working Directory
 WORKDIR /app
@@ -19,7 +19,7 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 # คัดลอก SSL Certificates (เตรียมไว้ในเครื่องโฮสต์)
 COPY ./certs /etc/nginx/certs
 
-# คัดลอก Backend Source Code
+# คัดลอก Backend Source Code จาก builder image
 COPY --from=builder /app /app
 WORKDIR /app
 
@@ -28,4 +28,3 @@ EXPOSE 443
 
 # รัน Nginx
 CMD ["nginx", "-g", "daemon off;"]
-
