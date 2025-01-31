@@ -1,0 +1,86 @@
+datasource db {
+    provider = "postgresql" // ใช้ฐานข้อมูล PostgreSQL
+    url      = env("DATABASE_URL") // URL ที่เชื่อมต่อกับฐานข้อมูล
+}
+
+generator client {
+    provider = "prisma-client-js" // ใช้ Prisma Client
+}
+
+model User {
+    id         String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    username   String   @unique
+    email      String   @unique
+    password   String
+    role       String   @default("USER")
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model About {
+    id         String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    content    String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model Profile {
+    id         String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    bio        String?
+    image      String?
+    first_name String?
+    last_name  String?
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model Projects {
+    id          String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    title       String
+    description String
+    tags        String[]
+    image   String
+    code_url String
+    demo_url String
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+}
+
+model Skills {
+    id         String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    name       String
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
+
+model Education {
+    id             String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    school         String
+    degree         String
+    field_of_study String
+    start_date     DateTime
+    end_date       DateTime
+    created_at     DateTime @default(now())
+    updated_at     DateTime @updatedAt
+}
+
+model Experience {
+    id          String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    company     String
+    position    String
+    description String
+    start_date  DateTime
+    end_date    DateTime
+    created_at  DateTime @default(now())
+    updated_at  DateTime @updatedAt
+}
+
+model Certificate {
+    id         String   @id @default(cuid()) // เปลี่ยนเป็น cuid
+    title      String
+    image      String
+    issued_by  String
+    date       DateTime
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+}
