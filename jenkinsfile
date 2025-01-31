@@ -54,7 +54,7 @@ pipeline {
                 script {
                     // ทดสอบว่า Backend พร้อมใช้งานหรือไม่
                     sh '''
-                    curl --fail https://api.profile.minuteszone.com || exit 1
+                    curl --fail https://apiprofile.minuteszone.com || exit 1
                     '''
                 }
             }
