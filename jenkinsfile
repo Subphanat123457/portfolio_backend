@@ -3,9 +3,10 @@ pipeline {
 
     environment {
         BACKEND_IMAGE = 'backend-nginx:latest'
-        BACKEND_DOCKERFILE = 'backend/Dockerfile'
+        BACKEND_DOCKERFILE = '/Dockerfile'
         BACKEND_DIR = 'backend'
-        REGISTRY = 'git@github.com:Subphanat123457/portfolio_backend.git'  // ระบุ Docker Registry ที่ใช้งาน
+        REGISTRY = 'docker.io'  // ระบุ Docker Registry ที่ใช้งาน
+        DOCKER_CREDENTIALS_ID = 'DockerHub'  // ใช้ชื่อ Credential จาก Jenkins
     }
 
     stages {
@@ -28,21 +29,22 @@ pipeline {
         stage('Push Backend Image to Docker Registry') {
             steps {
                 script {
-                    // Login to Docker registry if required
-                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD ${REGISTRY}'
-                    
+                    // Login to Docker registry using Jenkins Credentials
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD ${REGISTRY}'
+                    }
+
                     // Push the backend Docker image
                     sh 'docker push ${REGISTRY}/${BACKEND_IMAGE}'
                 }
             }
         }
 
-        stage('Deploy Backend') {
+        stage('Deploy Backend to Kubernetes') {
             steps {
                 script {
-                    // Deploy Backend service (สามารถปรับคำสั่งตามที่ใช้)
+                    // Deploy Backend service to Kubernetes (ปรับคำสั่งตามที่ใช้งาน)
                     sh '''
-                    # Deploy to Kubernetes or other service
                     kubectl set image deployment/backend-deployment backend=${REGISTRY}/${BACKEND_IMAGE} --record
                     '''
                 }

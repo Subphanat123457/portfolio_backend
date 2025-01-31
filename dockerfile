@@ -28,3 +28,4 @@ EXPOSE 443
 
 # รัน Nginx
 CMD ["nginx", "-g", "daemon off;"]
+
