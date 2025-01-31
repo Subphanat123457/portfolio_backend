@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    environment {
+        BACKEND_IMAGE = 'backend-nginx:latest'
+        BACKEND_DOCKERFILE = 'backend/Dockerfile'
+        BACKEND_DIR = 'backend'
+        REGISTRY = 'git@github.com:Subphanat123457/portfolio_backend.git'  // ระบุ Docker Registry ที่ใช้งาน
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm  // ดึงโค้ดจาก repository
+            }
+        }
+
+        stage('Build Backend') {
+            steps {
+                script {
+                    dir(BACKEND_DIR) {
+                        sh 'docker build -t ${REGISTRY}/${BACKEND_IMAGE} -f ${BACKEND_DOCKERFILE} .'
+                    }
+                }
+            }
+        }
+
+        stage('Push Backend Image to Docker Registry') {
+            steps {
+                script {
+                    // Login to Docker registry if required
+                    sh 'docker login -u $DOCKER_USER -p $DOCKER_PASSWORD ${REGISTRY}'
+                    
+                    // Push the backend Docker image
+                    sh 'docker push ${REGISTRY}/${BACKEND_IMAGE}'
+                }
+            }
+        }
+
+        stage('Deploy Backend') {
+            steps {
+                script {
+                    // Deploy Backend service (สามารถปรับคำสั่งตามที่ใช้)
+                    sh '''
+                    # Deploy to Kubernetes or other service
+                    kubectl set image deployment/backend-deployment backend=${REGISTRY}/${BACKEND_IMAGE} --record
+                    '''
+                }
+            }
+        }
+
+        stage('Verify Backend Deployment') {
+            steps {
+                script {
+                    // ทดสอบว่า Backend พร้อมใช้งานหรือไม่
+                    sh '''
+                    curl --fail https://api.profile.minuteszone.com || exit 1
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()  // Clean workspace
+        }
+        success {
+            echo 'Backend Deployment completed successfully!'
+        }
+        failure {
+            echo 'Backend Deployment failed.'
+        }
+    }
+}
