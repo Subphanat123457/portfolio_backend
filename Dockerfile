@@ -1,32 +1,31 @@
-# ใช้ Base Image ของ Bun สำหรับการ Build
-FROM oven/bun:latest AS builder
+# Use Bun as the base image for building the project
+FROM oven/bun:latest as builder
 
-# ตั้งค่า Working Directory
+# Set the working directory
 WORKDIR /app
 
-# คัดลอกไฟล์ทั้งหมดไปยัง Working Directory
+# Copy project files
 COPY . .
 
-# ติดตั้ง Dependencies
+# Install dependencies and build the project
 RUN bun install
+RUN bun run build
 
-# ใช้ Nginx เพื่อทำ Reverse Proxy
+# Use Nginx to serve the built files
 FROM nginx:latest
 
-# คัดลอกไฟล์ Nginx Configuration
+# Copy Nginx configuration file
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-# คัดลอก SSL Certificates (server.key และ server.csr)
-COPY ./server.key ./server.csr /etc/nginx/certs/
+# Copy SSL certificates
+COPY ./server.csr /etc/nginx/certs/server.csr
+COPY ./server.key /etc/nginx/certs/server.key
 
-# คัดลอก Backend Source Code จาก builder stage
-COPY --from=builder /app /app
+# Copy built files from the builder stage to Nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# ตั้งค่า Working Directory สำหรับการทำงาน
-WORKDIR /app
-
-# เปิดพอร์ต HTTPS
+# Expose HTTPS port
 EXPOSE 443
 
-# รัน Nginx
+# Run Nginx
 CMD ["nginx", "-g", "daemon off;"]
