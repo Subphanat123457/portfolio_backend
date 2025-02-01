@@ -1,4 +1,10 @@
-FROM oven/bun:latest
+FROM node:18-bullseye
+
+# ติดตั้ง Bun
+RUN curl -fsSL https://bun.sh/install | bash
+
+# เพิ่ม Bun ใน PATH
+ENV PATH="/root/.bun/bin:$PATH"
 
 WORKDIR /app
 
@@ -9,8 +15,9 @@ RUN bun install
 
 COPY src src
 COPY tsconfig.json .
-COPY prisma ./prisma/ 
+COPY prisma ./prisma/
 
-RUN npx prisma generate # สร้าง Prisma Client
+# ใช้ npx เพื่อสร้าง Prisma Client
+RUN npx prisma generate
 
 CMD ["bun", "run", "src/index.ts"]
