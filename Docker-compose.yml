@@ -1,0 +1,15 @@
+version: '3'
+services:
+  backend:
+    image: backend_portfolio
+    networks:
+      - backend-network
+  nginx:
+    image: nginx
+    networks:
+      - backend-network
+    ports:
+      - "80:80"
+      - "443:443"
+networks:
+  backend-network:
