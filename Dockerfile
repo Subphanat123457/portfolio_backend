@@ -1,31 +1,41 @@
-# Use Bun as the base image for building the project
-FROM oven/bun:1.0.0 AS build
+# ใช้ Base Image ของ Bun
+FROM oven/bun:latest AS backend
 
-# Set the working directory
+# ตั้งค่า Working Directory
 WORKDIR /app
 
-# Copy project files
-COPY . .
+# คัดลอก Dependencies
+COPY package.json .
+COPY bun.lockb .
 
-# Install dependencies and build the project
-RUN bun install
-RUN bun run build
+# ติดตั้ง Dependencies (ใช้ production เท่านั้น)
+RUN bun install --production
 
-# Use Nginx to serve the built files
-FROM nginx:latest
+# คัดลอก Source Code
+COPY src src
+COPY tsconfig.json .
 
-# Copy Nginx configuration file
+# ตั้งค่า Environment สำหรับ Production
+ENV NODE_ENV production
+
+# รัน Backend Server
+CMD ["bun", "src/index.ts"]
+
+# ใช้ Base Image ของ Nginx เพื่อทำ Reverse Proxy
+FROM nginx:latest AS nginx
+
+# คัดลอกไฟล์ Nginx Configuration
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 
-# Copy SSL certificates
-COPY ./server.csr /etc/nginx/certs/server.csr
-COPY ./server.key /etc/nginx/certs/server.key
+# คัดลอก SSL Certificates (ถ้ามี)
+COPY ./server.key ./server.csr /etc/nginx/certs/
 
-# Copy built files from the build stage to Nginx
-COPY --from=build /app /usr/share/nginx/html
+# คัดลอก Backend จาก Backend Stage
+COPY --from=backend /app /app
 
-# Expose HTTPS port
+# เปิดพอร์ต HTTP และ HTTPS
+EXPOSE 80
 EXPOSE 443
 
-# Run Nginx
+# รัน Nginx
 CMD ["nginx", "-g", "daemon off;"]
