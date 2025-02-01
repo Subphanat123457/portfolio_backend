@@ -1,5 +1,5 @@
 # Use Bun as the base image for building the project
-FROM oven/bun:latest as builder
+FROM oven/bun:latest AS build
 
 # Set the working directory
 WORKDIR /app
@@ -22,7 +22,7 @@ COPY ./server.csr /etc/nginx/certs/server.csr
 COPY ./server.key /etc/nginx/certs/server.key
 
 # Copy built files from the builder stage to Nginx
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expose HTTPS port
 EXPOSE 443
