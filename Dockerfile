@@ -21,8 +21,8 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 COPY ./server.csr /etc/nginx/certs/server.csr
 COPY ./server.key /etc/nginx/certs/server.key
 
-# Copy built files from the builder stage to Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copy built files from the build stage to Nginx
+COPY --from=build /app /usr/share/nginx/html
 
 # Expose HTTPS port
 EXPOSE 443
