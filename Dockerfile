@@ -30,9 +30,6 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 # คัดลอก SSL Certificates (ถ้ามี)
 COPY ./server.key ./server.csr /etc/nginx/certs/
 
-# คัดลอก Backend จาก Backend Stage
-COPY --from=backend /app /app
-
 # เปิดพอร์ต HTTP และ HTTPS
 EXPOSE 80
 EXPOSE 443
