@@ -1,15 +1,30 @@
 version: '3'
 services:
   backend:
-    image: backend_portfolio
+    build:
+      context: .
+      dockerfile: Dockerfile
     networks:
-      - backend-network
+      - app-network
+    expose:
+      - "8000"
   nginx:
     image: nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
     networks:
-      - backend-network
+      - app-network
     ports:
       - "80:80"
       - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./server.key:/etc/nginx/certs/server.key
+      - ./server.csr:/etc/nginx/certs/server.csr
+    depends_on:
+      - backend
+
 networks:
-  backend-network:
+  app-network:
+    driver: bridge
