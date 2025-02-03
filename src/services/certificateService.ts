@@ -1,13 +1,17 @@
-import { PrismaClient, Certificate as PrismaCertificate} from "@prisma/client";
+import { PrismaClient, Certificate as PrismaCertificate } from "@prisma/client";
 import { log } from "../utils/logger";
 
 const prisma = new PrismaClient();
 
 export const certificateService = {
-    getCertificates: async (): Promise<PrismaCertificate[]> => {
+    getCertificates: async (page: number = 1, pageSize: number = 10): Promise<PrismaCertificate[]> => {
         try {
-            log('Fetching all certificates');
-            const certificates = await prisma.certificate.findMany();
+            const skip = (page - 1) * pageSize;
+            log(`Fetching certificates - Page: ${page}, Page Size: ${pageSize}`);
+            const certificates = await prisma.certificate.findMany({
+                skip,
+                take: pageSize,
+            });
             log('Successfully fetched certificates', { count: certificates.length });
             return certificates;
         } catch (error) {
